@@ -1,0 +1,171 @@
+inovelli_blue_led_effect:
+  alias: Inovelli Blue - Set LED Effect
+  description: Sets the LED Notification bar on the Inovelli Blue (VZM31-SN) 2-1 Dimmer
+    Switch when used with Zigbee2MQTT
+  variables:
+    color: "{%- if color is not number %}\n  {{ color|default(\"Yellow\")|title }}\n{%-
+      else %}\n  {{ color|int }}\n{% endif %}\n"
+    level: '{{ level|default(80)|int }}'
+    duration: '{{ duration|default("Indefinitely")|title }}'
+    effect: '{{ effect|default("Fast Blink")|title }}'
+    colors:
+      'Off': 0
+      Red: 1
+      Orange: 21
+      Yellow: 42
+      Green: 85
+      Cyan: 127
+      Teal: 145
+      Blue: 170
+      Purple: 195
+      Light Pink: 220
+      Pink: 234
+    durations:
+      'Off': 0
+      1 Second: 1
+      2 Seconds: 2
+      3 Seconds: 3
+      4 Seconds: 4
+      5 Seconds: 5
+      6 Seconds: 6
+      7 Seconds: 7
+      8 Seconds: 8
+      9 Seconds: 9
+      10 Seconds: 10
+      15 Seconds: 15
+      20 Seconds: 20
+      25 Seconds: 25
+      30 Seconds: 30
+      35 Seconds: 35
+      40 Seconds: 40
+      45 Seconds: 45
+      50 Seconds: 50
+      55 Seconds: 55
+      60 Seconds: 60
+      2 Minutes: 62
+      3 Minutes: 63
+      4 Minutes: 64
+      10 Minutes: 70
+      15 Minutes: 75
+      30 Minutes: 90
+      45 Minutes: 105
+      1 Hour: 120
+      2 Hours: 122
+      Indefinitely: 255
+    effects:
+      'Off': 'Off'
+      Solid: solid
+      Fast Blink: fast_blink
+      Slow Blink: slow_blink
+      Pulse: pulse
+      Chase: chase
+      Open and Close: open_close
+      Small To Big: small_to_big
+  sequence:
+  - variables:
+      color: '{{ colors[color|title]|int }}'
+      duration: '{{ durations[duration|title] }}'
+      effect: '{{ effects[effect]|string }}'
+      level: '{{ level|int }}'
+  - service: mqtt.publish
+    data:
+      topic: zigbee2mqtt/Bathroom_Vanity_Zig/set
+      payload: "{% set output = {\"led_effect\":{\"effect\":effect, \"color\":color,\n\"duration\":duration,
+        \"level\":level } } %} \n{{ output|to_json }}\n"
+  fields:
+    entity_id:
+      description: Choose the Dimmer/Switch (VZM31-SN) with the LED bar you wish to
+        control.
+      example: light.nelson
+      required: true
+      selector:
+        entity:
+          multiple: false
+          integration: mqtt
+          domain:
+          - light
+          - switch
+    color:
+      description: Choose a color for the LED notification bar.
+      example: purple
+      required: true
+      selector:
+        select:
+          options:
+          - 'Off'
+          - Red
+          - Orange
+          - Yellow
+          - Green
+          - Cyan
+          - Teal
+          - Blue
+          - Purple
+          - Light Pink
+          - Pink
+    effect:
+      description: Choose an effect for the LED notification bar.
+      example: Fast Blink
+      required: true
+      default: Fast Blink
+      selector:
+        select:
+          options:
+          - 'Off'
+          - Solid
+          - Fast Blink
+          - Slow Blink
+          - Pulse
+          - Chase
+          - Open and Close
+          - Small To Big
+    level:
+      description: Choose a brightness level for the LED notification bar.
+      example: 95
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 100
+      default: 80
+    duration:
+      description: Choose a duration for the LED notification.
+      example: 10 seconds
+      required: true
+      selector:
+        select:
+          options:
+          - 'Off'
+          - 1 Second
+          - 2 Seconds
+          - 3 Seconds
+          - 4 Seconds
+          - 5 Seconds
+          - 6 Seconds
+          - 7 Seconds
+          - 8 Seconds
+          - 9 Seconds
+          - 10 Seconds
+          - 15 Seconds
+          - 20 Seconds
+          - 25 Seconds
+          - 30 Seconds
+          - 35 Seconds
+          - 40 Seconds
+          - 45 Seconds
+          - 50 Seconds
+          - 55 Seconds
+          - 60 Seconds
+          - 2 Minutes
+          - 3 Minutes
+          - 4 Minutes
+          - 10 Minutes
+          - 15 Minutes
+          - 30 Minutes
+          - 45 Minutes
+          - 1 Hour
+          - 2 Hours
+          - Indefinitely
+  mode: parallel
+  icon: mdi:led-on
+  max: 10
